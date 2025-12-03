@@ -19,8 +19,10 @@ class PC(Equipement,SQLModel, table=True):
     hostname: str = Field(index=True)
     type : str = "PC"
     disque: str
+    ip : str
     os: str
     memory: str
+    memory_used: Optional[str] = None
 
 class Switch(Equipement,SQLModel, table=True) : 
     id: Optional[int] = Field(default=None, primary_key=True)
