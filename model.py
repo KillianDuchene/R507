@@ -18,20 +18,22 @@ class PC(Equipement,SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     hostname: str = Field(index=True)
     type : str = "PC"
-    disque: int
+    disque: str
     os: str
-    disque_physique: str
     memory: str
 
 class Switch(Equipement,SQLModel, table=True) : 
     id: Optional[int] = Field(default=None, primary_key=True)
-    type : str = "switch"
+    type : str = "Switch"
     memory: str
     port : int
 
 
     
-
+class Routeur(Equipement,SQLModel, table=True) : 
+    id: Optional[int] = Field(default=None, primary_key=True)
+    type : str = "Routeur"
+    memory: str
 
 
     

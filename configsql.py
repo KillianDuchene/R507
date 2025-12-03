@@ -7,9 +7,8 @@ def pchote() :
     pcs = [
         PC(
             hostname= os.popen("hostname").read().strip(),
-            disque=50000,
+            disque=os.popen("df -h /").readlines()[1].split()[1],
             os=os.popen("lsb_release -d").read().strip().split()[1],
-            disque_physique="/mnt/sd1",
             memory= os.popen("free -h").readlines()[1].split()[1]
         )
         ]
