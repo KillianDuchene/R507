@@ -1,0 +1,21 @@
+meta {
+  name: New HTTP Request
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/pc
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "hostname": "PC-01",
+      "disque": 50000,
+      "os": "Ubuntu 20.04",
+      "disque_physique": "/mnt/sd1",
+      "memory": "16GB"
+  }
+}

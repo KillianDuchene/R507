@@ -1,0 +1,18 @@
+meta {
+  name: New HTTP Request
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/switch
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "memory" : "15G",
+    "port" : 24
+  }
+}
