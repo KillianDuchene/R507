@@ -36,7 +36,7 @@ class SSHConnection(BaseModel):
             
             client.connect(self.hostname, self.port, self.username, self.password, key_filename=self.key_filename)
             sftp = paramiko.SFTPClient.from_transport(client.get_transport())
-            sftp.put('agent.py', 'agent.py')
+            sftp.put(local_path, remote_path)
 
             client.close()
             return True
