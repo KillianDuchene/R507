@@ -8,7 +8,7 @@
 ## Lancement de l'application API et base de données
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ## Lancement de la supervision sur un hôte distant
@@ -157,7 +157,26 @@ Pour les éléments sensibles comme les routeurs, cette application envoie une r
 ## Lancement de l'infrastructure
 
 ```bash
+cd docker
 docker compose up
 ```
+Une fois l'infrastructure déployée, le port 8000 de l'hôte est mappé avec celui de l'API Docker.
+
+## fichier python
+### main.py
+
+**main.py** dispose de plusieurs dépendances et permet le lancement de l'API.
+
+### /request_api/requet.py
+
+**/request_api/requet.py** déploie **agent.py** sur les PC via SSH, ce qui permet à ces derniers de renvoyer leurs informations via l'API.
+
+### Routeurs
+
+Pour les routeurs, une connexion SSH est établie pour récupérer les informations et effectuer un appel à l'API.
+
+
 
 Des tests Bruno sont disponibles dans le dossier `/Bruno`.
+
+
