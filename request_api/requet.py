@@ -40,7 +40,7 @@ def requet_routeur(ip, port):
             interfaces_down[interface] = ip
     os = ssh.execute_command("vtysh -c 'show version'")[0].split()[0]
     print(os)
-    memory = ssh.execute_command("free -h")[0].split()[1]
+    memory = ssh.execute_command("free -h")[0].split()["\n"][1].split()[1]
     print(memory)
     timea = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print(timea)

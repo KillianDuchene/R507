@@ -1,168 +1,163 @@
 # Projet R507
 
-3 application : 
-- main.py : elle permet de lancer l'api et gerer la base de donné (model.py).
-- requet.py : elle vas envoyer le fichier agent.py via ssh (class : SSHConnection) et l'executer en arriere plan.
-- agent.py : elle vas s'executer sur l'ordinateur a superviser et envoyer tout les 60 seconde les informations (ram, disque, os, etc) a l'api defini dans man.py
+3 applications :
+- **main.py** : lance l'API et gère la base de données (model.py).
+- **requet.py** : envoie le fichier agent.py via SSH (classe : SSHConnection) et l'exécute en arrière-plan.
+- **agent.py** : s'exécute sur l'ordinateur à superviser et envoie toutes les 60 secondes les informations (RAM, disque, OS, etc.) à l'API définie dans main.py.
 
-## Lancement de l'application api et base de donnée : 
+## Lancement de l'application API et base de données
 
 ```bash
 uvicorn main:app --reload
 ```
 
-## Lancement de la supervision sur un hote distant  : 
+## Lancement de la supervision sur un hôte distant
+
 ```bash
 python3 requet.py
 ```
 
-## Utilisation dans un context d'infrastructure 
+## Utilisation dans un contexte d'infrastructure
 
-pour simuler une infrastrusture a superviser j'ai utiliser docker-compose pour simuler 3 pc-client et 2 routeur :
+Pour simuler une infrastructure à superviser, j'ai utilisé docker-compose pour simuler 3 PC-client et 2 routeurs :
 
-### Les 3 pc :
+### Les 3 PC
 
 ```docker
-
 services:
-  pc-1:
-    build: dockerclient/.
-    container_name: pc-1
-    hostname: pc-1
-    ports:
-      - "2221:22"
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.11
-    restart: always
+    pc-1:
+        build: dockerclient/.
+        container_name: pc-1
+        hostname: pc-1
+        ports:
+            - "2221:22"
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.11
+        restart: always
 
-  pc-2:
-    build: dockerclient/.
-    container_name: pc-2
-    hostname: pc-2
-    ports:
-      - "2222:22"
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.12
-    restart: always
+    pc-2:
+        build: dockerclient/.
+        container_name: pc-2
+        hostname: pc-2
+        ports:
+            - "2222:22"
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.12
+        restart: always
 
-  pc-3:
-    build: dockerclient/.
-    container_name: pc-3
-    hostname: pc-3
-    ports:
-      - "2223:22"
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.13
-    restart: always
+    pc-3:
+        build: dockerclient/.
+        container_name: pc-3
+        hostname: pc-3
+        ports:
+            - "2223:22"
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.13
+        restart: always
 ```
-Mes pc client on comme address ip : 172.25.0.11,172.25.0.12,172.25.0.13
-le port ssh est macther avec l'hote sur les port 2222,2223,2224 pour pouvoir les joindre depuis le docker-compose et egalement depuis l'exterieur
 
-### Les 2 routeur :
+Les PC clients ont comme adresses IP : 172.25.0.11, 172.25.0.12, 172.25.0.13. Le port SSH est mappé avec l'hôte sur les ports 2221, 2222, 2223 pour pouvoir les joindre depuis docker-compose et de l'extérieur.
+
+### Les 2 routeurs
 
 ```docker
-  router:
-    image: aguacero7/frr-router:latest
-    container_name: router
-    hostname: router-1
-    privileged: true
-    ports:
-      - "2224:22"
-    cap_add:
-      - NET_ADMIN
-      - SYS_ADMIN
-      - NET_RAW
-    sysctls:
-      - net.ipv4.ip_forward=1
-      - net.ipv6.conf.all.forwarding=0
-    volumes:
-      - ./vtysh.conf:/etc/frr/vtysh.conf
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.250
-    restart: always
+    router:
+        image: aguacero7/frr-router:latest
+        container_name: router
+        hostname: router-1
+        privileged: true
+        ports:
+            - "2224:22"
+        cap_add:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - NET_RAW
+        sysctls:
+            - net.ipv4.ip_forward=1
+            - net.ipv6.conf.all.forwarding=0
+        volumes:
+            - ./vtysh.conf:/etc/frr/vtysh.conf
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.250
+        restart: always
 
-  router-2:
-    image: aguacero7/frr-router:latest
-    container_name: router-2
-    hostname: router-2
-    privileged: true
-    ports:
-      - "2225:22"
-    cap_add:
-      - NET_ADMIN
-      - SYS_ADMIN
-      - NET_RAW
-    sysctls:
-      - net.ipv4.ip_forward=1
-      - net.ipv6.conf.all.forwarding=0
-    volumes:
-      - ./vtysh.conf:/etc/frr/vtysh.conf
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.251
-    restart: always
+    router-2:
+        image: aguacero7/frr-router:latest
+        container_name: router-2
+        hostname: router-2
+        privileged: true
+        ports:
+            - "2225:22"
+        cap_add:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - NET_RAW
+        sysctls:
+            - net.ipv4.ip_forward=1
+            - net.ipv6.conf.all.forwarding=0
+        volumes:
+            - ./vtysh.conf:/etc/frr/vtysh.conf
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.251
+        restart: always
 ```
 
-### J'ai également 2 application docker utilie pour la supervisation
+### 2 applications Docker pour la supervision
 
 #### api_serveur
 
 ```docker
-  api_serveur:
-    build: ../.
-    container_name: api_serveur
-    hostname: api_serveur
-    ports:
-      - "8000:8000"
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.100
-    volumes:
-      - ../base_equipement.db:/app/base_equipement.db
-    restart: always
-
+    api_serveur:
+        build: ../.
+        container_name: api_serveur
+        hostname: api_serveur
+        ports:
+            - "8000:8000"
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.100
+        volumes:
+            - ../base_equipement.db:/app/base_equipement.db
+        restart: always
 ```
-Cette application vas permetre de cree l'api et de gerer la base de donné
 
-Les chemin de l'api sont : 
-* get /routeurs : permet de lister les routeurs
-* post /routeur : permet d'ajouter les specification d'un routeur
-* delete /routeur/id : permet de supprimé un routeur
+Cette application crée l'API et gère la base de données.
 
-
-
-* get /pcs : permet de lister les PCs
-* post /pc : permet d'ajouter les specification d'un pc
-* delete /pc/id : permet de supprimé un pc
-* get /name/pc_hostname : permet de lister tout les pcs en fonction du hostname
-
-il y a egalement d'autre chemin comme les switch et les put mais je ne les utilise pas dans l'outil de supervisation
-
+Chemins disponibles de l'API :
+- `GET /routeurs` : liste les routeurs
+- `POST /routeur` : ajoute un routeur
+- `DELETE /routeur/id` : supprime un routeur
+- `GET /pcs` : liste les PC
+- `POST /pc` : ajoute un PC
+- `DELETE /pc/id` : supprime un PC
+- `GET /name/pc_hostname` : liste les PC par hostname
 
 #### requet_api
 
 ```docker
-  requet_api:
-    build: ../request_api/.
-    container_name: requet_api
-    hostname: requet_api
-    networks:
-      reseau_prive:
-        ipv4_address: 172.25.0.150
-    restart: always
-
+    requet_api:
+        build: ../request_api/.
+        container_name: requet_api
+        hostname: requet_api
+        networks:
+            reseau_prive:
+                ipv4_address: 172.25.0.150
+        restart: always
 ```
-Cette application fait le lien entre les element a superviser et l'api, elle vas envoyer le fichier python "agent.py" en ssh aux PCs afin qu'il envoit tout seul leur information a l'api tout les 60 seconde.
 
-Pour les element plus sensible comme les routeur ces l'application qui vas leur envoyer une requete ssh afin de recuperer leur information et de les transmettre grace a l'api
+Cette application fait le lien entre les éléments à superviser et l'API. Elle envoie le fichier agent.py via SSH aux PC pour qu'ils envoient automatiquement leurs informations à l'API toutes les 60 secondes.
 
-Pour lancer cette infrastructure il suffit de faire la commande dans le dossier docker: 
+Pour les éléments sensibles comme les routeurs, cette application envoie une requête SSH pour récupérer leurs informations et les transmet via l'API.
+
+## Lancement de l'infrastructure
+
 ```bash
-docker compose up 
+docker compose up
 ```
 
-Des test Buno sont egalement disponible dans le dossier /Bruno
+Des tests Bruno sont disponibles dans le dossier `/Bruno`.
