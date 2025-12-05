@@ -58,7 +58,7 @@ def requet_routeur(ip, port):
 while True:
     requet_routeur("172.25.0.250", 22)
     requet_routeur("172.25.0.251", 22)
-    time.sleep(600)
+    time.sleep(60)
 
 
 
