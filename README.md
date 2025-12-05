@@ -134,6 +134,7 @@ Les chemin de l'api sont :
 * delete /routeur/id : permet de supprimé un routeur
 
 
+
 * get /pcs : permet de lister les PCs
 * post /pc : permet d'ajouter les specification d'un pc
 * delete /pc/id : permet de supprimé un pc
@@ -155,7 +156,13 @@ il y a egalement d'autre chemin comme les switch et les put mais je ne les utili
     restart: always
 
 ```
-
-Cette application fait le lien entre les element a superviser et l'api, elle vas envoyer le fichier python "agent.py" en ssh aux PCs afin qu'il envoit tout seul leur information a l'api sans aucun contact de celle-ci.
+Cette application fait le lien entre les element a superviser et l'api, elle vas envoyer le fichier python "agent.py" en ssh aux PCs afin qu'il envoit tout seul leur information a l'api tout les 60 seconde.
 
 Pour les element plus sensible comme les routeur ces l'application qui vas leur envoyer une requete ssh afin de recuperer leur information et de les transmettre grace a l'api
+
+Pour lancer cette infrastructure il suffit de faire la commande dans le dossier docker: 
+```bash
+docker compose up 
+```
+
+Des test Buno sont egalement disponible dans le dossier /Bruno
