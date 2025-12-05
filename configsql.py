@@ -23,4 +23,4 @@ def pchote() :
 def configure():
     if not os.path.exists("base_equipement.db"):
         SQLModel.metadata.create_all(bind=engine)
-        pchote()
+        #pchote()

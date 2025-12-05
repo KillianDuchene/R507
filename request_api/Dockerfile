@@ -1,16 +1,16 @@
 FROM python:3.9-slim
 
 RUN apt-get update && apt-get install -y \
+    ssh-client \
     lsb-release
 
 WORKDIR /app
 
-COPY main.py .
-COPY model.py .
-COPY configsql.py .
+COPY requet.py .
 COPY requirements.txt .
-
+COPY agent.py .
+COPY sshconnect.py .
 
 RUN pip install -r requirements.txt
 
-CMD ["uvicorn", "main:app","--reload","--host","0.0.0.0","--port","8000"]
+CMD ["python","requet.py"]

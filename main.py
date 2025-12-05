@@ -1,12 +1,39 @@
 from http.client import HTTPException
 from fastapi import FastAPI
-from model import PC,engine, Switch
-from typing import Optional
+from model import PC,engine, Switch, Routeur
 from sqlmodel import Session, select
 from configsql import configure
-from sshconnect import SSHConnection
+
 
 app = FastAPI(on_startup=[configure])
+
+
+
+@app.get("/routeurs")
+def read_hosts() -> list[Routeur]:
+    with Session(engine) as session:
+        hosts = session.exec(select(Routeur)).all()
+        return hosts
+    
+@app.post("/routeur")
+def create_host(routeur: Routeur) -> Routeur:
+    with Session(engine) as session:
+        session.add(routeur)
+        session.commit()
+        session.refresh(routeur)
+        return routeur
+    
+
+
+@app.delete("/routeur/{routeur_id}")
+def delete_host(routeur_id: int) -> dict:
+    with Session(engine) as session:
+        host = session.get(Routeur, routeur_id)
+        if not host: raise HTTPException(status_code=404, detail="Host not found")
+        session.delete(host)
+        session.commit()
+        return {"ok": True}
+    
 
 
 
@@ -60,6 +87,13 @@ def create_host(pc: PC) -> PC:
         session.refresh(pc)
         return pc
     
+@app.get("/name/{pc_hostname}")
+def read_host_by_name(pc_hostname: str) -> list[PC]:
+    with Session(engine) as session:
+        hosts = session.exec(select(PC).where(PC.hostname == pc_hostname)).all()
+        if not hosts: raise HTTPException(status_code=404, detail="Host not found")
+        return hosts
+
 @app.delete("/pc/{pc_id}")
 def delete_host(pc_id: int) -> dict:
     with Session(engine) as session:

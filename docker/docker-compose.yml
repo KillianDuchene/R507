@@ -1,0 +1,106 @@
+
+services:
+  pc-1:
+    build: dockerclient/.
+    container_name: pc-1
+    hostname: pc-1
+    ports:
+      - "2221:22"
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.11
+    restart: always
+
+  pc-2:
+    build: dockerclient/.
+    container_name: pc-2
+    hostname: pc-2
+    ports:
+      - "2222:22"
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.12
+    restart: always
+
+  pc-3:
+    build: dockerclient/.
+    container_name: pc-3
+    hostname: pc-3
+    ports:
+      - "2223:22"
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.13
+    restart: always
+
+  router:
+    image: aguacero7/frr-router:latest
+    container_name: router
+    hostname: router-1
+    privileged: true
+    ports:
+      - "2224:22"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - NET_RAW
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=0
+    volumes:
+      - ./vtysh.conf:/etc/frr/vtysh.conf
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.250
+    restart: always
+
+  router-2:
+    image: aguacero7/frr-router:latest
+    container_name: router-2
+    hostname: router-2
+    privileged: true
+    ports:
+      - "2225:22"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - NET_RAW
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=0
+    volumes:
+      - ./vtysh.conf:/etc/frr/vtysh.conf
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.251
+    restart: always
+
+  api_serveur:
+    build: ../.
+    container_name: api_serveur
+    hostname: api_serveur
+    ports:
+      - "8000:8000"
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.100
+    volumes:
+      - ../base_equipement.db:/app/base_equipement.db
+    restart: always
+
+  requet_api:
+    build: ../request_api/.
+    container_name: requet_api
+    hostname: requet_api
+    networks:
+      reseau_prive:
+        ipv4_address: 172.25.0.150
+    restart: always
+  
+
+networks:
+  reseau_prive:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16

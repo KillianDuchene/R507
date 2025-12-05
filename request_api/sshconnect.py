@@ -7,13 +7,11 @@ class SSHConnection(BaseModel):
     username: str
     password: Optional[str] = None
     key_filename: Optional[str] = None
-    port: int = 22
+    port: int = None
 
     def execute_command(self, command: str) -> tuple[str, str, int]:
         try:
             client = paramiko.SSHClient()
-            
-            
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
             client.connect(self.hostname, self.port, self.username, self.password, key_filename=self.key_filename)
